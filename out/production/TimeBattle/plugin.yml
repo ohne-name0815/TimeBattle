@@ -1,0 +1,10 @@
+name: TimeBattle
+version: 1.0
+author: [ohne_name0815, OnkelBecherLP]
+main: plugin.timebattle.Main
+
+commands:
+  timebattle:
+    description: dgsakjdhaskjf
+    usage: /<command>
+    aliases: [tb]
