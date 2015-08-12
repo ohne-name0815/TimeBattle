@@ -60,8 +60,9 @@ public class Main extends JavaPlugin {
     }
 
     private void initConfig() {
-        getConfig().addDefault("ENABLED", false);
-        getConfig().options().copyDefaults(true);
+        //getConfig().addDefault("ENABLED", false);
+        //getConfig().options().copyDefaults(true);
+        saveDefaultConfig();
     }
 
     public void setServerMaxPlayerCount(int maxPlayers) {
@@ -88,15 +89,17 @@ public class Main extends JavaPlugin {
 
     private void initWorlds() {
         if(getConfig().contains("worlds")) {
-            for(String worldKey : getConfig().getConfigurationSection("worlds").getKeys(false)) {
-                Boolean enabled = getConfig().getBoolean("worlds." + worldKey + ".enabled");
-                String worldName = getConfig().getString("worlds." + worldKey + ".worldName");
-                String timeName = getConfig().getString("worlds." + worldKey + ".timeName");
+            if(getConfig().getConfigurationSection("worlds") != null) {
+                for (String worldKey : getConfig().getConfigurationSection("worlds").getKeys(false)) {
+                    Boolean enabled = getConfig().getBoolean("worlds." + worldKey + ".enabled");
+                    String worldName = getConfig().getString("worlds." + worldKey + ".worldName");
+                    String timeName = getConfig().getString("worlds." + worldKey + ".timeName");
 
-                List<String> spawns = getConfig().getStringList("worlds." + worldKey + ".spawns");
+                    List<String> spawns = getConfig().getStringList("worlds." + worldKey + ".spawns");
 
-                TimeWorld timeWorld = new TimeWorld(worldName, timeName, enabled, spawns);
-                this.timeWorlds.add(timeWorld);
+                    TimeWorld timeWorld = new TimeWorld(worldName, timeName, enabled, spawns);
+                    this.timeWorlds.add(timeWorld);
+                }
             }
         }
     }

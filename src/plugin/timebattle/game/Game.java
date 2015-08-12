@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import plugin.timebattle.Main;
 import plugin.timebattle.threads.GameStartTimer;
+import plugin.timebattle.threads.WorldChangeTimer;
 import plugin.timebattle.utils.MessageUtils;
 import plugin.timebattle.utils.TimeWorld;
 import plugin.timebattle.utils.TimeWorldUtils;
@@ -33,6 +34,7 @@ public class Game {
 
     // TIMER
     private Thread gameStartTimer;
+    private Thread worldChangeTimer;
 
 
 
@@ -85,25 +87,27 @@ public class Game {
     }
 
     public void updateStartTimer() {
-        if(this.players.size() >= (this.maxPlayers / 2.0d)) {
-            if(this.gameStartTimer == null) {
-                MessageUtils.broadcast("§7Das Spiel startet in 30 Sekunden!");
-                this.gameStartTimer = new Thread(new GameStartTimer(main, 30, new Runnable() {
-                    @Override
-                    public void run() {
-                        startGame();
-                    }
-                }));
-                this.gameStartTimer.start();
-            }
-        } else {
-            if(this.gameStartTimer != null) {
-                this.gameStartTimer.interrupt();
-                this.gameStartTimer.stop();
+        if(!started) {
+            if (this.players.size() >= (this.maxPlayers / 2.0d)) {
+                if (this.gameStartTimer == null) {
+                    MessageUtils.broadcast("§7Das Spiel startet in 30 Sekunden!");
+                    this.gameStartTimer = new Thread(new GameStartTimer(main, 30, new Runnable() {
+                        @Override
+                        public void run() {
+                            startGame();
+                        }
+                    }));
+                    this.gameStartTimer.start();
+                }
+            } else {
+                if (this.gameStartTimer != null) {
+                    this.gameStartTimer.interrupt();
+                    this.gameStartTimer.stop();
 
-                this.gameStartTimer = null;
+                    this.gameStartTimer = null;
 
-                MessageUtils.broadcast("§7Der Countdown wurde abgebrochen, da sich zu wenig Spieler im Spiel befinden!");
+                    MessageUtils.broadcast("§7Der Countdown wurde abgebrochen, da sich zu wenig Spieler im Spiel befinden!");
+                }
             }
         }
     }
@@ -117,6 +121,13 @@ public class Game {
             Player player = Bukkit.getPlayer(playerName);
             main.freezeThread.removePlayer(player);
         }
+
+        worldChangeTimer = new Thread(new WorldChangeTimer(main, WORLD_CHANGE_DELAY_SECONDS, new Runnable() {
+            @Override
+            public void run() {
+                changeWorld();
+            }
+        }));
     }
 
     public void changeWorld() {
@@ -138,8 +149,17 @@ public class Game {
                 Location spawn = spawns.get(random.nextInt(spawns.size()));
                 spawns.remove(spawn);
 
+                player.getInventory().clear();
+
                 player.teleport(spawn);
             }
+
+            worldChangeTimer = new Thread(new WorldChangeTimer(main, WORLD_CHANGE_DELAY_SECONDS, new Runnable() {
+                @Override
+                public void run() {
+                    changeWorld();
+                }
+            }));
         }
     }
 

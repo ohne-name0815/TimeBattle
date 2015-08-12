@@ -7,32 +7,40 @@ import plugin.timebattle.utils.MessageUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GameStartTimer implements Runnable {
+public class WorldChangeTimer implements Runnable {
 
-    Main main;
-    int counter;
-    Runnable runnable;
+    private Main main;
+    private int counter;
+    private Runnable runnable;
 
-    public List<Integer> remindingSeconds = new ArrayList<>();
+    private List<Integer> remindingSeconds = new ArrayList<>();
 
-    public GameStartTimer(Main main, int seconds, Runnable runnable) {
-        this.counter = seconds;
+    public WorldChangeTimer(Main main, int counter, Runnable runnable) {
+        this.main = main;
+        this.counter = counter;
+        this.runnable = runnable;
 
+        remindingSeconds.add(120);
+        remindingSeconds.add(60);
+        remindingSeconds.add(30);
         remindingSeconds.add(10);
         remindingSeconds.add(5);
         remindingSeconds.add(4);
         remindingSeconds.add(3);
         remindingSeconds.add(2);
         remindingSeconds.add(1);
-
-        this.runnable = runnable;
     }
+
 
     @Override
     public void run() {
         for(counter = counter; counter >= 0; counter--) {
             if(remindingSeconds.contains(counter)) {
-                MessageUtils.broadcast("ยง7Das Spiel beginnt in ยงb" + counter + " ยง7Sekunden!");
+                if(counter / 60 > 0 && counter % 60 == 0) {
+                    MessageUtils.broadcast(counter / 60 > 0 && counter % 60 == 0 ?
+                            "ง7Die Zeitepoche wird in งb" + (counter / 60) + " ง7Minuten gewechselt!" :
+                            "ง7Die Zeitepoche wird in งb" + counter + " ง7Sekunden gewechselt!");
+                }
             }
 
             if(counter == 0) {

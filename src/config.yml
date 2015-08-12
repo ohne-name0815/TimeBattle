@@ -1,0 +1,7 @@
+# TimeBattle Config
+
+# Specify if TimeBattle-Game is enabled
+enabled: false
+
+# The TimeBattle worlds
+worlds: []
