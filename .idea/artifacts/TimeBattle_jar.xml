@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="jar" build-on-make="true" name="TimeBattle:jar">
-    <output-path>$USER_HOME$/Desktop</output-path>
+    <output-path>D:/Anderes/MC Plugins/Testserver/GameServer/plugins</output-path>
     <root id="archive" name="TimeBattle.jar">
       <element id="module-output" name="TimeBattle" />
     </root>
