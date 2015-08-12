@@ -1,20 +1,18 @@
 package plugin.timebattle;
 
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.craftbukkit.libs.org.ibex.nestedvm.util.Seekable;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import plugin.timebattle.commands.timebattle;
 import plugin.timebattle.game.Game;
 import plugin.timebattle.listener.PlayerBuildListener;
 import plugin.timebattle.listener.ServerListener;
+import plugin.timebattle.listener.world.BlockBreakListener;
 import plugin.timebattle.threads.FreezeThread;
+import plugin.timebattle.utils.MessageUtils;
 import plugin.timebattle.utils.TimeWorld;
 import plugin.timebattle.utils.TimeWorldUtils;
 
-import java.io.File;
-import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,29 +29,54 @@ public class Main extends JavaPlugin {
 
         //getDataFolder().mkdir();
 
+        MessageUtils.init(this);
+
         initConfig();
         TimeWorldUtils.init(this);
 
         timeWorlds = new ArrayList<>();
         initWorlds();
 
-        getServer().getPluginManager().registerEvents(new PlayerBuildListener(), this);
-        getServer().getPluginManager().registerEvents(new ServerListener(this), this);
-
-        freezeThread = new FreezeThread(this);
-        new Thread(freezeThread).start();
+        registerListener();
 
         getCommand("timebattle").setExecutor(new timebattle(this));
 
-        getLogger().info("Game is creating...");
-        game = new Game(this);
-        getLogger().info("Game created!");
+        if(getConfig().getBoolean("ENABLED")) {
+            freezeThread = new FreezeThread(this);
+            new Thread(freezeThread).start();
+
+            getLogger().info("Game is creating...");
+            game = new Game(this);
+            getLogger().info("Game created!");
+        }
 
         getLogger().info("TimeBattle successfully enabled!");
     }
 
+    private void registerListener() {
+        getServer().getPluginManager().registerEvents(new BlockBreakListener(), this);
+        getServer().getPluginManager().registerEvents(new PlayerBuildListener(), this);
+        getServer().getPluginManager().registerEvents(new ServerListener(this), this);
+    }
+
     private void initConfig() {
+        getConfig().addDefault("ENABLED", false);
         getConfig().options().copyDefaults(true);
+    }
+
+    public void setServerMaxPlayerCount(int maxPlayers) {
+        getLogger().info("Updating player count to " + maxPlayers);
+        try {
+            String bukkitversion = Bukkit.getServer().getClass().getPackage().getName().substring(23);
+            Object playerlist = Class.forName("org.bukkit.craftbukkit." + bukkitversion + ".CraftServer")
+                    .getDeclaredMethod("getHandle", null).invoke(Bukkit.getServer(), null);
+            Field maxplayers = playerlist.getClass().getSuperclass()
+                    .getDeclaredField("maxPlayers");
+            maxplayers.setAccessible(true);
+            maxplayers.set(playerlist, maxPlayers);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

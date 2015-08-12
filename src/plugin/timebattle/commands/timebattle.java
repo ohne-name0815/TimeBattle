@@ -5,6 +5,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import plugin.timebattle.Main;
+import plugin.timebattle.utils.MessageUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,6 @@ public class timebattle implements CommandExecutor {
 
         if(args[0].equalsIgnoreCase("addworld")) {
             if(args.length > 1) {
-                // TODO Add world to config
                 String worldName = ((Player) commandSender).getWorld().getName();
 
                 if(!main.getConfig().contains("worlds." + worldName)) {
@@ -39,7 +39,7 @@ public class timebattle implements CommandExecutor {
 
                     main.saveConfig();
 
-                    commandSender.sendMessage("ERFOLGREICH HINZUGEFÜGT!");
+                    MessageUtils.send(commandSender, "§7Die Zeitepoche §b" + timeName + " §7wurde erfolgreich erstellt!");
                 }
             }
         }
@@ -57,7 +57,31 @@ public class timebattle implements CommandExecutor {
                         player.getLocation().getPitch());
                 main.getConfig().set("worlds." + worldName + ".spawns", spawns);
                 main.saveConfig();
+
+                MessageUtils.send(commandSender, "§7Spawnpunkt hinzugefügt. Anzahl der Spawnpunkte: §b" + spawns.size());
             }
+        }
+
+        if(args[0].equalsIgnoreCase("enabletime")) {
+            String worldName = ((Player) commandSender).getWorld().getName();
+            main.getConfig().set("worlds." + worldName + ".enabled", true);
+            main.saveConfig();
+        }
+
+        if(args[0].equalsIgnoreCase("disabletime")) {
+            String worldName = ((Player) commandSender).getWorld().getName();
+            main.getConfig().set("worlds." + worldName + ".enabled", false);
+            main.saveConfig();
+        }
+
+        if(args[0].equalsIgnoreCase("enable")) {
+            main.getConfig().set("ENABLED", true);
+            main.saveConfig();
+        }
+
+        if(args[0].equalsIgnoreCase("disable")) {
+            main.getConfig().set("ENABLED", false);
+            main.saveConfig();
         }
 
         return true;

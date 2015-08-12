@@ -34,7 +34,6 @@ public class FreezeThread implements Runnable {
                     Location location = playerFreezeLocations.get(playerName);
 
                     if(player.getLocation().getBlockX() != location.getBlockX() ||
-                            player.getLocation().getBlockY() != location.getBlockY() ||
                             player.getLocation().getBlockZ() != location.getBlockZ()) {
                         location.setYaw(player.getLocation().getYaw());
                         location.setPitch(player.getLocation().getPitch());
@@ -46,7 +45,7 @@ public class FreezeThread implements Runnable {
             }
 
             try {
-                Thread.sleep(1000);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

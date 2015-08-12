@@ -17,7 +17,11 @@ public class ServerListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         // TODO Join game
-        main.game.join(event.getPlayer());
+        if(main.game != null && !main.game.started) {
+            main.game.join(event.getPlayer());
+        } else {
+            event.getPlayer().kickPlayer("§4Das Spiel hat bereits begonnen!");
+        }
     }
 
     @EventHandler
